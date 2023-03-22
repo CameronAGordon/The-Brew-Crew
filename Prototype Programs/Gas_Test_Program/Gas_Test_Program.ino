@@ -1,4 +1,4 @@
-*!
+/*
  * @file getGasPPM.ino
  * @brief Reading Gas concentration, A concentration of one part per million (PPM).
  * @n When using IIC device, select I2C address,
@@ -10,11 +10,11 @@
  * @author ZhixinLiu(zhixin.liu@dfrobot.com)
  * @version V1.2
  * @date 2021-06-18
- * @url https://github.com/DFRobot/DFRobot_MICS
+ * url https://github.com/DFRobot/DFRobot_MICS
  */
 #include "DFRobot_MICS.h"
 
-#define CALIBRATION_TIME   3                      // Default calibration time is three minutes
+#define CALIBRATION_TIME   2                     // Default calibration time is three minutes
 
 // When using I2C communication, use the following program to construct an object by DFRobot_MICS_I2C
 /**
@@ -38,7 +38,7 @@ DFRobot_MICS_I2C mics(&Wire, MICS_I2C_ADDRESS);
 
 void setup() 
 {
-  Serial.begin(115200);
+  Serial.begin(9600);
   while(!Serial);
   while(!mics.begin()){
     Serial.println("NO Deivces !");
@@ -83,9 +83,9 @@ void loop()
    *   NH3      = 0x08  (Ammonia)          (1    - 500)PPM
    *   NO2      = 0x0A  (Nitrogen Dioxide) (0.1  - 10)PPM
    */
-  float gasdata = mics.getGasData(C2H5OH);
+  float gasdata = mics.getGasData(CH4);
   Serial.print(gasdata,1);
   Serial.println(" PPM");
-  delay(1000);
+  delay(100);
   //mics.sleepMode();
 }
