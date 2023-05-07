@@ -8,7 +8,7 @@ X = np.array([
 ]).T
 
 # Define the output data (target variable)
-y = np.array(['NC', 'NC', 'NC', 'NC', 'NC', 'NC', 'NC', 'NC', 'NC', 'NC', 'NC', 'NC', 'NC', 'NC', 'NC', 'NC', 'NC', 'NC', 'NC', 'NC', 'Coffee', 'Coffee', 'Coffee', 'Coffee', 'Coffee', 'NC', 'NC', 'NC', 'NC', 'NC', 'NC', 'NC', 'NC', 'NC', 'NC'])
+y = np.array(['Tea', 'Tea', 'Tea', 'Tea', 'Tea', 'Coke', 'Coke', 'Coke', 'Coke', 'Coke', 'Boiling', 'Boiling', 'Boiling', 'Boiling', 'Boiling', 'Beer', 'Beer', 'Beer', 'Beer', 'Beer', 'Coffee', 'Coffee', 'Coffee', 'Coffee', 'Coffee', 'Open Air', 'Open Air', 'Open Air', 'Open Air', 'Open Air', 'Room Temp Water', 'Room Temp Water', 'Room Temp Water', 'Room Temp Water', 'Room Temp Water'])
 
 # Split the data into training and validation sets
 X_train, X_valid, y_train, y_valid = train_test_split(X, y, test_size=0.2, random_state=42)
@@ -19,4 +19,4 @@ model.fit(X_train, y_train)
 
 # Test the model on the validation set
 accuracy = model.score(X_valid, y_valid)
-print('Validation accuracy:', accuracy) 
+print('Validation accuracy:', accuracy)
