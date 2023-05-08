@@ -26,7 +26,9 @@ SOFTWARE.
 
 #include "Wire.h"
 #include "veml6040.h"
+#include "SparkFun_SGP30_Arduino_Library.h" // Click here to get the library: http://librarymanager/All#SparkFun_SGP30
 
+SGP30 mySensor; //create an object of the SGP30 class
 VEML6040 RGBWSensor;
 
 byte bitConvert(uint16_t valueRGB)
@@ -139,6 +141,10 @@ void setup() {
     Serial.println("ERROR: couldn't detect the sensor");
     while(1){}
   }
+  if (mySensor.begin() == false) {
+    Serial.println("No SGP30 Detected. Check connections.");
+    while (1);
+  }
    
   /*
    * init RGBW sensor with: 
@@ -147,13 +153,16 @@ void setup() {
    *  - color sensor enable
    */
     
-	RGBWSensor.setConfiguration(VEML6040_IT_320MS + VEML6040_AF_AUTO + VEML6040_SD_ENABLE);
-	
+  RGBWSensor.setConfiguration(VEML6040_IT_320MS + VEML6040_AF_AUTO + VEML6040_SD_ENABLE);
+  
   delay(1500);
   Serial.println("Vishay VEML6040 RGBW color sensor auto mode example");
   Serial.println("CCT: Correlated color temperature in \260K");
   Serial.println("AL: Ambient light in lux");
   delay(1500);
+  //Initializes sensor for air quality readings
+  //measureAirQuality should be called in one second increments after a call to initAirQuality
+  mySensor.initAirQuality();
 }
 
 void loop() {
@@ -235,6 +244,10 @@ if (pH !=-1)
     Serial.println("");
     delay(2000);
   }
+  mySensor.measureAirQuality();
+  Serial.print("CO2: ");
+  Serial.print(mySensor.CO2);
+  Serial.println(" ppm");
 
 
 }
