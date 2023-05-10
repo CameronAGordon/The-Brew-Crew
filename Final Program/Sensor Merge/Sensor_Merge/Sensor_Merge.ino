@@ -1,19 +1,14 @@
 /*
-
 The MIT License (MIT)
-
 Copyright (c) 2015 thewknd
-
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
 to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 copies of the Software, and to permit persons to whom the Software is
 furnished to do so, subject to the following conditions:
-
 The above copyright notice and this permission notice shall be included in all
 copies or substantial portions of the Software.
-
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -21,21 +16,54 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
 */
 
 #include "Wire.h"
 #include "veml6040.h"
-#include "SparkFun_SGP30_Arduino_Library.h" // Click here to get the library: http://librarymanager/All#SparkFun_SGP30
+#include "SparkFun_SGP30_Arduino_Library.h" 
 
-SGP30 mySensor; //create an object of the SGP30 class
-VEML6040 RGBWSensor;
+SGP30 mySensor;
+VEML6040 pHSensor;
+VEML6040 drinkSensor;
+
 
 byte bitConvert(uint16_t valueRGB)
 {
   float scaledRGB = (float)(valueRGB/(65535.0))*255.0;
   byte scaledRGB_byte = (byte)scaledRGB;
   return scaledRGB_byte; 
+}
+
+float hueConvert(float Hue)
+{
+    if (Hue >= 0 && Hue < 30)
+  {
+    Serial.print(" - Red");
+  }
+    if (Hue >= 30 && Hue < 60)
+  {
+    Serial.print(" - Orange");
+  }
+  if (Hue >= 60 && Hue < 120)
+  {
+    Serial.print(" - Yellow");
+  }
+  if (Hue >= 120 && Hue < 180)
+  {
+    Serial.print(" - Green");
+  }
+    if (Hue >= 180 && Hue < 240)
+  {
+    Serial.print(" - Cyan");
+  }
+  if (Hue >= 240 && Hue < 300)
+  {
+    Serial.print(" - Blue");
+  }
+    if (Hue >= 300 && Hue < 360)
+  {
+    Serial.print(" - Magenta");
+  }
 }
 
 // pH to RGB Using Color Picker Tool Online
@@ -135,15 +163,19 @@ void setup() {
   Serial.begin(9600);
   Wire.begin(); 
 
-
-
-  if(!RGBWSensor.begin()) {
-    Serial.println("ERROR: couldn't detect the sensor");
-    while(1){}
-  }
   if (mySensor.begin() == false) {
     Serial.println("No SGP30 Detected. Check connections.");
     while (1);
+  }
+
+  if(!pHSensor.begin()) {
+    Serial.println("ERROR: couldn't detect the sensor");
+    while(1){}
+  }
+
+    if(!drinkSensor.begin()) {
+    Serial.println("ERROR: couldn't detect the sensor");
+    while(1){}
   }
    
   /*
@@ -153,68 +185,36 @@ void setup() {
    *  - color sensor enable
    */
     
-  RGBWSensor.setConfiguration(VEML6040_IT_320MS + VEML6040_AF_AUTO + VEML6040_SD_ENABLE);
-  
+	pHSensor.setConfiguration(VEML6040_IT_320MS + VEML6040_AF_AUTO + VEML6040_SD_ENABLE);
+  drinkSensor.setConfiguration(VEML6040_IT_160MS + VEML6040_AF_AUTO + VEML6040_SD_ENABLE);
+	
   delay(1500);
   Serial.println("Vishay VEML6040 RGBW color sensor auto mode example");
   Serial.println("CCT: Correlated color temperature in \260K");
   Serial.println("AL: Ambient light in lux");
   delay(1500);
-  //Initializes sensor for air quality readings
-  //measureAirQuality should be called in one second increments after a call to initAirQuality
+
   mySensor.initAirQuality();
 }
 
 void loop() {
-  byte newRed = bitConvert(RGBWSensor.getRed());
-  byte newBlue = bitConvert(RGBWSensor.getBlue());
-  byte newGreen = bitConvert(RGBWSensor.getGreen());
+  byte pHRed = bitConvert(pHSensor.getRed());
+  byte pHBlue = bitConvert(pHSensor.getBlue());
+  byte pHGreen = bitConvert(pHSensor.getGreen());
 
-  rgbToHsv(newRed, newGreen, newBlue, Hue, Saturation, Value);
+  rgbToHsv(pHRed, pHGreen, pHBlue, Hue, Saturation, Value);
 
-  Serial.print("RED: ");
-  Serial.print(newRed);  
-  Serial.print(" GREEN: ");
-  Serial.print(newGreen);  
-  Serial.print(" BLUE: ");
-  Serial.print(newBlue);  
+  Serial.print("pH RED: ");
+  Serial.print(pHRed);  
+  Serial.print(" pH GREEN: ");
+  Serial.print(pHGreen);  
+  Serial.print(" pH BLUE: ");
+  Serial.print(pHBlue);  
 
   Serial.println(" ");
-  Serial.print("The hue of the beverage is: ");
+  Serial.print("The hue of the pH Paper is: ");
   Serial.print(Hue);
-
-  if (Hue >= 0 && Hue < 30)
-  {
-    Serial.print(" - Red");
-  }
-    if (Hue >= 30 && Hue < 60)
-  {
-    Serial.print(" - Orange");
-  }
-  if (Hue >= 60 && Hue < 120)
-  {
-    Serial.print(" - Yellow");
-  }
-  if (Hue >= 120 && Hue < 180)
-  {
-    Serial.print(" - Green");
-  }
-    if (Hue >= 180 && Hue < 240)
-  {
-    Serial.print(" - Cyan");
-  }
-  if (Hue >= 240 && Hue < 300)
-  {
-    Serial.print(" - Blue");
-  }
-    if (Hue >= 300 && Hue < 360)
-  {
-    Serial.print(" - Magenta");
-  }
-
-
-
-  
+  Serial.print(hueConvert(Hue));
 //   Serial.print(" WHITE: ");
 //   Serial.print(RGBWSensor.getWhite()); 
 //   Serial.print(" CCT: ");
@@ -222,10 +222,9 @@ void loop() {
 //   Serial.print(" AL: ");
 //   Serial.println(RGBWSensor.getAmbientLight()); 
 // delay (2000);
-float pH = convertRGBtoPH(newRed, newGreen, newBlue);
+float pH = convertRGBtoPH(pHRed, pHGreen, pHBlue);
 
 delay(2000);
-
 
 
 if (pH !=-1)
@@ -244,6 +243,27 @@ if (pH !=-1)
     Serial.println("");
     delay(2000);
   }
+
+  byte drinkRed = bitConvert(drinkSensor.getRed());
+  byte drinkBlue = bitConvert(drinkSensor.getBlue());
+  byte drinkGreen = bitConvert(drinkSensor.getGreen());
+
+  rgbToHsv(drinkRed, drinkGreen, drinkBlue, Hue, Saturation, Value);
+
+  Serial.print("drink RED: ");
+  Serial.print(drinkRed);  
+  Serial.print(" drink GREEN: ");
+  Serial.print(drinkGreen);  
+  Serial.print(" drink BLUE: ");
+  Serial.print(drinkBlue);  
+
+  Serial.println(" ");
+  Serial.print("The hue of the Beverage is: ");
+  Serial.print(Hue);
+  Serial.print(hueConvert(Hue));
+
+  delay(2000);
+  Serial.println(" ");
   mySensor.measureAirQuality();
   Serial.print("CO2: ");
   Serial.print(mySensor.CO2);
