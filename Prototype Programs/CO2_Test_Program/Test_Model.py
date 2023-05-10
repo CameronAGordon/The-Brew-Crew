@@ -1,6 +1,9 @@
 import numpy as np
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
+from sklearn.tree import export_graphviz
+from IPython.display import Image
+import graphviz
 
 # Define the input data
 X = np.array([
@@ -19,4 +22,9 @@ model.fit(X_train, y_train)
 
 # Test the model on the validation set
 accuracy = model.score(X_valid, y_valid)
-print('Validation accuracy:', accuracy) 
+print('Validation accuracy:', accuracy)
+
+# Visualize one of the decision trees in the forest
+dot_data = export_graphviz(model.estimators_[0], out_file=None, feature_names=['spectral_data'])
+graph = graphviz.Source(dot_data)
+Image(graph.pipe(format='png'))
