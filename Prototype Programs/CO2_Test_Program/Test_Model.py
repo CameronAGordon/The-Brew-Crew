@@ -4,6 +4,10 @@ from sklearn.model_selection import train_test_split
 from sklearn.tree import export_graphviz
 from IPython.display import Image
 import graphviz
+import os
+
+# Add the path to the Graphviz executable to the system's PATH environment variable
+os.environ["PATH"] += os.pathsep + 'C:/Program Files/Graphviz2.38/bin/'
 
 # Define the input data
 X = np.array([
@@ -24,7 +28,10 @@ model.fit(X_train, y_train)
 accuracy = model.score(X_valid, y_valid)
 print('Validation accuracy:', accuracy)
 
-# Visualize one of the decision trees in the forest
+# Visualize one of the decision trees in the forest and save it to a file
 dot_data = export_graphviz(model.estimators_[0], out_file=None, feature_names=['spectral_data'])
-graph = graphviz.Source(dot_data)
-Image(graph.pipe(format='png'))
+graph = graphviz.Source(dot_data, engine='dot')
+graph.render(filename='tree', directory='.', format='png')
+
+# Display the saved image
+Image(filename='tree.png')
