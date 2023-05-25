@@ -28,7 +28,11 @@ If you have the 'serial' library installed, the data collection code will not ru
 Make sure to restart the computer for these changes to take effect.
 
 Make sure to change the COM Port value in both the Arduino and the Python code to reflect the COM port used in your system to power the Arduino. In the Arduino IDE, if you have an Arduino connected, you can determine the COM port being used using the drop-down menu and selecting: Tools -> Port. 
+
+
 ![image](https://github.com/CameronAGordon/The-Brew-Crew/assets/113693190/91634ec5-07c8-46db-8140-f68423b91de0). 
+
+
 If you have multiple COM ports in use, select the one connected to the Arduino device. 
 
 
