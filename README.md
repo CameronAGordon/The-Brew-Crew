@@ -26,6 +26,7 @@ You will also need to install the pyserial library using command prompt to colle
 If you have the 'serial' library installed, the data collection code will not run. If this is the case, run the command:
   pip uninstall serial
 Make sure to restart the computer for these changes to take effect.
+For more information, see the Python Software How-To in the handover documentation.
 
 Make sure to change the COM Port value in both the Arduino and the Python code to reflect the COM port used in your system to power the Arduino. In the Arduino IDE, if you have an Arduino connected, you can determine the COM port being used using the drop-down menu and selecting: Tools -> Port. 
 
