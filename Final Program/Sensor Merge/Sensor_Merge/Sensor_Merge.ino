@@ -23,7 +23,6 @@ SOFTWARE.
 #include "SparkFun_SGP30_Arduino_Library.h" 
 
 SGP30 mySensor;
-VEML6040 pHSensor;
 VEML6040 drinkSensor;
 
 
@@ -34,37 +33,33 @@ byte bitConvert(uint16_t valueRGB)
   return scaledRGB_byte; 
 }
 
-float hueConvert(float Hue)
-{
-    if (Hue >= 0 && Hue < 30)
-  {
-    Serial.print(" - Red");
+String hueConvert(float Hue) {
+  if (Hue >= 0 && Hue < 30) {
+    return "Red";
   }
-    if (Hue >= 30 && Hue < 60)
-  {
-    Serial.print(" - Orange");
+  else if (Hue >= 30 && Hue < 60) {
+    return "Orange";
   }
-  if (Hue >= 60 && Hue < 120)
-  {
-    Serial.print(" - Yellow");
+  else if (Hue >= 60 && Hue < 120) {
+    return "Yellow";
   }
-  if (Hue >= 120 && Hue < 180)
-  {
-    Serial.print(" - Green");
+  else if (Hue >= 120 && Hue < 180) {
+    return "Green";
   }
-    if (Hue >= 180 && Hue < 240)
-  {
-    Serial.print(" - Cyan");
+  else if (Hue >= 180 && Hue < 240) {
+    return "Cyan";
   }
-  if (Hue >= 240 && Hue < 300)
-  {
-    Serial.print(" - Blue");
+  else if (Hue >= 240 && Hue < 300) {
+    return "Blue";
   }
-    if (Hue >= 300 && Hue < 360)
-  {
-    Serial.print(" - Magenta");
+  else if (Hue >= 300 && Hue < 360) {
+    return "Magenta";
+  }
+  else {
+    return "Unknown";
   }
 }
+
 
 // pH to RGB Using Color Picker Tool Online
 // Hue values can be used to 
@@ -123,40 +118,36 @@ float convertRGBtoPH(int r, int g, int b) {
   return -1;
 }
 
-void rgbToHsv(byte r, byte g, byte b, float &h, float &s, float &v)
-{
+void rgbToHsv(byte r, byte g, byte b, float &h, float &s, float &v) {
   float red = float(r) / 255.0;
   float green = float(g) / 255.0;
   float blue = float(b) / 255.0;
 
-  float cmax = max(max(red,green), blue);
-  float cmin = min(min(red,green), blue);
+  float cmax = max(max(red, green), blue);
+  float cmin = min(min(red, green), blue);
   float delta = cmax - cmin;
 
-  if (delta == 0)
-  {
+  if (delta == 0) {
     h = 0;
   }
-  else if (cmax == red)
-  {
-    h = fmod((green-blue) / delta, 6.0);
+  else if (cmax == red) {
+    h = 60 * fmod(((green - blue) / delta), 6.0);
   }
-  else if (cmax == green)
-  {
-    h = ((blue - red) / delta) + 2;
+  else if (cmax == green) {
+    h = 60 * (((blue - red) / delta) + 2);
   }
-  else
-  {
-    h = ((red-green) / delta) + 4;
+  else {
+    h = 60 * (((red - green) / delta) + 4);
   }
-h = h*60;
-if  (h < 0)
-{
-  h += 360;
-}
-  s = (cmax ==0) ? 0 : delta / cmax;
+
+  if (h < 0) {
+    h += 360;
+  }
+
+  s = (cmax == 0) ? 0 : delta / cmax;
   v = cmax;
 }
+
 
 
 void setup() {
@@ -166,11 +157,6 @@ void setup() {
   if (mySensor.begin() == false) {
     Serial.println("No SGP30 Detected. Check connections.");
     while (1);
-  }
-
-  if(!pHSensor.begin()) {
-    Serial.println("ERROR: couldn't detect the sensor");
-    while(1){}
   }
 
     if(!drinkSensor.begin()) {
@@ -185,36 +171,28 @@ void setup() {
    *  - color sensor enable
    */
     
-	pHSensor.setConfiguration(VEML6040_IT_320MS + VEML6040_AF_AUTO + VEML6040_SD_ENABLE);
-  drinkSensor.setConfiguration(VEML6040_IT_160MS + VEML6040_AF_AUTO + VEML6040_SD_ENABLE);
+  drinkSensor.setConfiguration(VEML6040_IT_40MS + VEML6040_AF_AUTO + VEML6040_SD_ENABLE);
 	
-  delay(1500);
-  Serial.println("Vishay VEML6040 RGBW color sensor auto mode example");
-  Serial.println("CCT: Correlated color temperature in \260K");
-  Serial.println("AL: Ambient light in lux");
+
   delay(1500);
 
   mySensor.initAirQuality();
 }
 
 void loop() {
-  byte pHRed = bitConvert(pHSensor.getRed());
-  byte pHBlue = bitConvert(pHSensor.getBlue());
-  byte pHGreen = bitConvert(pHSensor.getGreen());
 
-  rgbToHsv(pHRed, pHGreen, pHBlue, Hue, Saturation, Value);
+  if (Serial.available() > 0) {
+    String message = Serial.readStringUntil('\n');
+    // Remove newline character from the message
+    message.trim();
 
-  Serial.print("pH RED: ");
-  Serial.print(pHRed);  
-  Serial.print(" pH GREEN: ");
-  Serial.print(pHGreen);  
-  Serial.print(" pH BLUE: ");
-  Serial.print(pHBlue);  
+    if (message == "reset") {
+      Serial.println("Resetting Arduino...");
+      delay(1000);
+      asm volatile("jmp 0");
+    }
+  }
 
-  Serial.println(" ");
-  Serial.print("The hue of the pH Paper is: ");
-  Serial.print(Hue);
-  Serial.print(hueConvert(Hue));
 //   Serial.print(" WHITE: ");
 //   Serial.print(RGBWSensor.getWhite()); 
 //   Serial.print(" CCT: ");
@@ -222,52 +200,36 @@ void loop() {
 //   Serial.print(" AL: ");
 //   Serial.println(RGBWSensor.getAmbientLight()); 
 // delay (2000);
-float pH = convertRGBtoPH(pHRed, pHGreen, pHBlue);
-
-delay(2000);
 
 
-if (pH !=-1)
-  {
-  Serial.println("");
-  Serial.println("The estimated pH of this liquid is: ");
-  Serial.print(pH);
-  Serial.println("");
 
-  delay(2000);
-  }
-  else 
-  {
-    Serial.println("");
-    Serial.println("pH is invalid");
-    Serial.println("");
-    delay(2000);
-  }
-
-  byte drinkRed = bitConvert(drinkSensor.getRed());
+  byte drinkRed  = bitConvert(drinkSensor.getRed());
   byte drinkBlue = bitConvert(drinkSensor.getBlue());
   byte drinkGreen = bitConvert(drinkSensor.getGreen());
 
   rgbToHsv(drinkRed, drinkGreen, drinkBlue, Hue, Saturation, Value);
-
-  Serial.print("drink RED: ");
+  //delay(50);
+  Serial.print("RED: ");
   Serial.print(drinkRed);  
-  Serial.print(" drink GREEN: ");
+  Serial.print(" GREEN: ");
   Serial.print(drinkGreen);  
-  Serial.print(" drink BLUE: ");
+  Serial.print(" BLUE: ");
   Serial.print(drinkBlue);  
 
   Serial.println(" ");
-  Serial.print("The hue of the Beverage is: ");
-  Serial.print(Hue);
-  Serial.print(hueConvert(Hue));
+  delay(50);
+  Serial.print("HUE: ");
+  Serial.print(round((int)Hue));
+  Serial.print(" ");
 
-  delay(2000);
+
   Serial.println(" ");
+  delay(50);
   mySensor.measureAirQuality();
   Serial.print("CO2: ");
   Serial.print(mySensor.CO2);
   Serial.println(" ppm");
+  delay(50);
 
 
 }

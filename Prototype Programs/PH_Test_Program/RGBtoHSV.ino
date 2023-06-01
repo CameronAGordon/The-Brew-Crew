@@ -22,7 +22,6 @@ SOFTWARE.
 
 #include "Wire.h"
 #include "veml6040.h"
-#include "veml6040_2.h"
 #include "SparkFun_SGP30_Arduino_Library.h" 
 
 // SGP30 mySensor;
@@ -30,7 +29,7 @@ VEML6040 pHSensor;
 // VEML6040_2 drinkSensor;
 
 
-byte bitConvert(uint16_t valueRGB)
+byte bitConvert(byte valueRGB)
 {
   float scaledRGB = (float)(valueRGB/(65535.0))*255.0;
   byte scaledRGB_byte = (byte)scaledRGB;
@@ -63,41 +62,40 @@ byte bitConvert(uint16_t valueRGB)
 // const byte red[] = {186, 225, 249, 236, 244, 244, 254, 200, 111, 98, 73, 67, 48, 62};
 // const byte green[] = {58, 75, 146, 143, 173, 249, 212, 169, 98, 88, 70, 46, 31, 31};
 // const byte blue[] = {55, 77, 67, 37, 19, 22, 100, 102, 63, 76, 127, 65, 50, 37};
+//
+//byte rgbValues[4][3] = {
+//  // {186,58, 55},
+//  {225,75,77},
+//  {249,146, 67},
+//  {236, 143, 37},
+//  {244, 173, 19},
+//  // {244, 249, 22},
+//  // {254, 212, 100},
+//  // {200, 169, 102},
+//  // {111, 98, 63},
+//  // {98,88,76},
+//  // {73, 70, 127},
+//  // {67, 46, 65},
+//  // {48, 31, 50},
+//  // {62, 31, 37}
+//};
 
-byte rgbValues[4][3] = {
-  // {186,58, 55},
-  {225,75,77},
-  {249,146, 67},
-  {236, 143, 37},
-  {244, 173, 19},
-  // {244, 249, 22},
-  // {254, 212, 100},
-  // {200, 169, 102},
-  // {111, 98, 63},
-  // {98,88,76},
-  // {73, 70, 127},
-  // {67, 46, 65},
-  // {48, 31, 50},
-  // {62, 31, 37}
-};
 
-float Hue, Saturation, Value;
-
-const float pHValues[4] = {2.0,3.0,4.0,5.0};
-
-float convertRGBtoPH(int r, int g, int b) {
-  for (int i = 0; i < 3; i++) {
-    if (r == rgbValues[i][0] && g == rgbValues[i][1] && b == rgbValues[i][2]) {
-      return pHValues[i];
-    }
-    else if (r > rgbValues[i][0] && r < rgbValues[i+1][0] && g > rgbValues[i][1] && g < rgbValues[i+1][1] && b > rgbValues[i][2] && b < rgbValues[i+1][2]) {
-      float pH = pHValues[i] + ((pHValues[i+1] - pHValues[i]) / (rgbValues[i+1][0] - rgbValues[i][0])) * (r - rgbValues[i][0]);
-      return pH;
-    }
-  }
-  // If the RGB values do not match any calibration data points, return -1
-  return -1;
-}
+//const float pHValues[4] = {2.0,3.0,4.0,5.0};
+//
+//float convertRGBtoPH(int r, int g, int b) {
+//  for (int i = 0; i < 3; i++) {
+//    if (r == rgbValues[i][0] && g == rgbValues[i][1] && b == rgbValues[i][2]) {
+//      return pHValues[i];
+//    }
+//    else if (r > rgbValues[i][0] && r < rgbValues[i+1][0] && g > rgbValues[i][1] && g < rgbValues[i+1][1] && b > rgbValues[i][2] && b < rgbValues[i+1][2]) {
+//      float pH = pHValues[i] + ((pHValues[i+1] - pHValues[i]) / (rgbValues[i+1][0] - rgbValues[i][0])) * (r - rgbValues[i][0]);
+//      return pH;
+//    }
+//  }
+//  // If the RGB values do not match any calibration data points, return -1
+//  return -1;
+//}
 
 void rgbToHsv(byte r, byte g, byte b, float &h, float &s, float &v)
 {
